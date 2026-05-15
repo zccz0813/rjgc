@@ -1,0 +1,49 @@
+
+# 1. 初始化本地仓库
+git init
+
+# 2. 添加当前文件夹下所有文件
+git add .
+
+# 3. 提交到本地仓库
+git commit -m "first commit"
+
+# 4. 设置主分支名
+git branch -M main
+
+# 5. 连接到你 GitHub 上的仓库
+git remote add origin https://github.com/xxxx/xxxx.git
+
+# 6. 推送代码到 GitHub
+git push -u origin main
+
+
+
+# 1. 初始化本地仓库
+git init
+# 2. 添加当前文件夹下所有文件
+git add .
+
+git remote remove origin
+#3. 连接到你 GitHub 上的仓库
+git remote add origin https://github.com/xxxx/xxxx.git
+
+# 先查看一下当前有哪些文件要被提交
+git status
+
+# 提交所有已添加的文件
+git commit -m "first commit"
+推送代码
+git push -u origin main
+
+后续日常使用（修改代码后上传）
+git add .
+git commit -m "这里写你修改了什么"
+git push
+
+需求	                                                命令/操作
+第一次下载别人的项目	                        git clone <仓库地址>
+下载自己的项目继续开发	                git clone <仓库地址>，然后 cd 进入
+只想要代码文件，不要版本记录	        点击 Download ZIP
+已有本地仓库，拉取最新代码	        git pull
+想下载特定分支	                                git clone -b <分支名> <仓库地址>

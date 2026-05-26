@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}用户管理 - 管理员后台{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="fas fa-users me-2"></i>用户管理
+        </h2>
+        
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>共 <strong>{{ total }}</strong> 名学生用户
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>邮箱</th>
+                        <th>电话</th>
+                        <th>状态</th>
+                        <th>当前借阅</th>
+                        <th>累计借阅</th>
+                        <th>注册时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.real_name }}</td>
+                        <td>{{ user.email if user.email else '-' }}</td>
+                        <td>{{ user.phone if user.phone else '-' }}</td>
+                        <td>
+                            {% if user.status == 0 %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>正常
+                            </span>
+                            {% else %}
+                            <span class="badge bg-danger">
+                                <i class="fas fa-ban me-1"></i>冻结
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.borrow_count }}</td>
+                        <td>{{ user.total_borrow }}</td>
+                        <td>{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else '-' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">
+                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                            暂无用户数据
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 分页 -->
+        {% if total > 20 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin.manage_users', page=page-1) }}">上一页</a>
+                </li>
+                {% endif %}
+                
+                {% set total_pages = ((total - 1) // 20 + 1) %}
+                {% for p in range(1, total_pages + 1) %}
+                    {% if p == page %}
+                    <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                    {% elif p <= 5 or p > total_pages - 3 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.manage_users', page=p) }}">{{ p }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page < total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin.manage_users', page=page+1) }}">下一页</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

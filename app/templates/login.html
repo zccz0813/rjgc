@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}登录 - 校园图书借阅管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h4 class="mb-0">
+                    <i class="fas fa-book-open me-2"></i>图书借阅管理系统
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user me-1"></i>用户名/学号
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="username" name="username" 
+                               placeholder="请输入用户名" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock me-1"></i>密码
+                        </label>
+                        <input type="password" class="form-control form-control-lg" id="password" name="password" 
+                               placeholder="请输入密码" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>登录
+                        </button>
+                    </div>
+                </form>
+                <hr class="my-4">
+                <div class="text-center">
+                    <small class="text-muted">测试账户：</small><br>
+                    <small class="text-muted">学生：20240001 / 123456</small><br>
+                    <small class="text-muted">管理员：admin / 123456</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

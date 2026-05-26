@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}{{ '编辑' if book else '添加' }}图书 - 管理员后台{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-{{ 'edit' if book else 'plus-circle' }} me-2"></i>
+                    {{ '编辑图书' if book else '添加新图书' }}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="title" class="form-label">书名 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   value="{{ book.title if book else '' }}" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="author" class="form-label">作者</label>
+                            <input type="text" class="form-control" id="author" name="author" 
+                                   value="{{ book.author if book else '' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="publisher" class="form-label">出版社</label>
+                            <input type="text" class="form-control" id="publisher" name="publisher" 
+                                   value="{{ book.publisher if book else '' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="isbn" class="form-label">ISBN</label>
+                            <input type="text" class="form-control" id="isbn" name="isbn" 
+                                   value="{{ book.isbn if book else '' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="publish_year" class="form-label">出版年份</label>
+                            <input type="number" class="form-control" id="publish_year" name="publish_year" 
+                                   value="{{ book.publish_year if book else '' }}" min="1900" max="2025">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="category_code" class="form-label">分类号</label>
+                            <input type="text" class="form-control" id="category_code" name="category_code" 
+                                   value="{{ book.category_code if book else '' }}" 
+                                   placeholder="例：F270-49">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="call_number" class="form-label">索书号</label>
+                            <input type="text" class="form-control" id="call_number" name="call_number" 
+                                   value="{{ book.call_number if book else '' }}" 
+                                   placeholder="例：F270-49/21">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="total_copies" class="form-label">总库存</label>
+                            <input type="number" class="form-control" id="total_copies" name="total_copies" 
+                                   value="{{ book.total_copies if book else 1 }}" min="1" required>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin.manage_books') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>返回
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>{{ '保存修改' if book else '添加图书' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

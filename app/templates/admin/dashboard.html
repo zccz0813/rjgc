@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}管理员后台{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="fas fa-tachometer-alt me-2"></i>管理员仪表板
+        </h2>
+        
+        <!-- 统计卡片 -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card bg-primary text-white shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">总藏书</h6>
+                                <h2 class="mb-0">{{ book_count }}</h2>
+                                <small>本图书</small>
+                            </div>
+                            <i class="fas fa-book fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-success text-white shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">注册用户</h6>
+                                <h2 class="mb-0">{{ user_count }}</h2>
+                                <small>名学生</small>
+                            </div>
+                            <i class="fas fa-users fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-warning text-dark shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">当前借阅</h6>
+                                <h2 class="mb-0">{{ stats.current_borrow }}</h2>
+                                <small>本书未还</small>
+                            </div>
+                            <i class="fas fa-hand-holding fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card bg-danger text-white shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">逾期未还</h6>
+                                <h2 class="mb-0">{{ stats.overdue_borrow }}</h2>
+                                <small>本逾期</small>
+                            </div>
+                            <i class="fas fa-exclamation-triangle fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 借阅统计 -->
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card shadow">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-line me-2"></i>借阅统计
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <tr>
+                                <td>总借阅次数</td>
+                                <td><strong>{{ stats.total_borrow }}</strong> 次</td>
+                            </tr>
+                            <tr>
+                                <td>当前借阅</td>
+                                <td><strong>{{ stats.current_borrow }}</strong> 本</td>
+                            </tr>
+                            <tr>
+                                <td>逾期未还</td>
+                                <td class="text-danger"><strong>{{ stats.overdue_borrow }}</strong> 本</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="card shadow">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-fire me-2"></i>热门图书 TOP 10
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if stats.hot_books %}
+                        <ol class="list-group list-group-numbered">
+                            {% for book in stats.hot_books[:10] %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    {{ book.title }}
+                                    <br>
+                                    <small class="text-muted">{{ book.author }}</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ book.borrow_times }}次</span>
+                            </li>
+                            {% endfor %}
+                        </ol>
+                        {% else %}
+                        <p class="text-muted text-center">暂无借阅数据</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 快捷操作 -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bolt me-2"></i>快捷操作
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3 mb-2">
+                                <a href="{{ url_for('admin.manage_books') }}" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-plus-circle me-2"></i>添加图书
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a href="{{ url_for('admin.manage_borrowings') }}" class="btn btn-outline-success w-100">
+                                    <i class="fas fa-exchange-alt me-2"></i>借阅管理
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a href="{{ url_for('admin.manage_users') }}" class="btn btn-outline-info w-100">
+                                    <i class="fas fa-user-plus me-2"></i>用户管理
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a href="{{ url_for('books.list') }}" class="btn btn-outline-secondary w-100">
+                                    <i class="fas fa-search me-2"></i>图书查询
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}我的借阅{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="fas fa-list me-2"></i>我的借阅记录
+        </h2>
+        
+        {% if borrowings %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-primary">
+                    <tr>
+                        <th>#</th>
+                        <th>书名</th>
+                        <th>作者</th>
+                        <th>借书日期</th>
+                        <th>应还日期</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in borrowings %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <a href="{{ url_for('books.detail', book_id=record.book_id) }}" class="text-decoration-none">
+                                {{ record.title }}
+                            </a>
+                        </td>
+                        <td>{{ record.author }}</td>
+                        <td>{{ record.borrow_date }}</td>
+                        <td class="{% if record.status == 'overdue' %}text-danger fw-bold{% endif %}">
+                            {{ record.due_date }}
+                        </td>
+                        <td>
+                            {% if record.status == 'borrowed' %}
+                            <span class="badge bg-warning">
+                                <i class="fas fa-hourglass-half me-1"></i>借阅中
+                            </span>
+                            {% elif record.status == 'overdue' %}
+                            <span class="badge bg-danger">
+                                <i class="fas fa-exclamation-circle me-1"></i>逾期未还
+                            </span>
+                            {% elif record.status == 'returned' %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>已归还
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.status == 'borrowed' or record.status == 'overdue' %}
+                            <form method="POST" action="{{ url_for('borrow.return_book', record_id=record.id) }}" 
+                                  onsubmit="return confirm('确认归还《{{ record.title }}》吗？')">
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    <i class="fas fa-undo-alt me-1"></i>归还
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle fa-2x mb-2 d-block"></i>
+            <h5>暂无借阅记录</h5>
+            <p>您还没有借阅任何图书，快去 <a href="{{ url_for('books.list') }}">图书查询</a> 借阅吧！</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

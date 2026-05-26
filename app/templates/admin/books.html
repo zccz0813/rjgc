@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}图书管理 - 管理员后台{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-book me-2"></i>图书管理
+            </h2>
+            <a href="{{ url_for('admin.add_book') }}" class="btn btn-success">
+                <i class="fas fa-plus-circle me-2"></i>添加图书
+            </a>
+        </div>
+        
+        <!-- 统计信息 -->
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>共 <strong>{{ total }}</strong> 本图书
+        </div>
+        
+        <!-- 图书列表 -->
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>书名</th>
+                        <th>作者</th>
+                        <th>出版社</th>
+                        <th>索书号</th>
+                        <th>库存</th>
+                        <th>可借</th>
+                        <th>借阅次数</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                    <tr>
+                        <td>{{ book.id }}</td>
+                        <td>
+                            <a href="{{ url_for('books.detail', book_id=book.id) }}" class="text-decoration-none">
+                                {{ book.title }}
+                            </a>
+                        </td>
+                        <td>{{ book.author if book.author else '-' }}</td>
+                        <td>{{ book.publisher if book.publisher else '-' }}</td>
+                        <td>{{ book.call_number if book.call_number else '-' }}</td>
+                        <td>{{ book.total_copies }}</td>
+                        <td class="{% if book.available_copies == 0 %}text-danger{% else %}text-success{% endif %}">
+                            {{ book.available_copies }}
+                        </td>
+                        <td>{{ book.borrow_count }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.edit_book', book_id=book.id) }}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit me-1"></i>编辑
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" 
+                                    data-bs-target="#deleteModal{{ book.id }}">
+                                <i class="fas fa-trash me-1"></i>删除
+                            </button>
+                            
+                            <!-- 删除确认模态框 -->
+                            <div class="modal fade" id="deleteModal{{ book.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">确认删除</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>确定要删除《{{ book.title }}》吗？</p>
+                                            <p class="text-danger">此操作不可恢复！</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                            <form method="POST" action="{{ url_for('admin.delete_book', book_id=book.id) }}" style="display: inline;">
+                                                <button type="submit" class="btn btn-danger">确认删除</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">
+                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                            暂无图书数据
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 分页 -->
+        {% if total > 20 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin.manage_books', page=page-1) }}">上一页</a>
+                </li>
+                {% endif %}
+                
+                {% set total_pages = ((total - 1) // 20 + 1) %}
+                {% for p in range(1, total_pages + 1) %}
+                    {% if p == page %}
+                    <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                    {% elif p <= 5 or p > total_pages - 3 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.manage_books', page=p) }}">{{ p }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page < total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin.manage_books', page=page+1) }}">下一页</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

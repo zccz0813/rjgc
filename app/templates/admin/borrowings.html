@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}借阅管理 - 管理员后台{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="fas fa-exchange-alt me-2"></i>借阅管理
+        </h2>
+        
+        <!-- 筛选标签 -->
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+                <a class="nav-link {% if not status %}active{% endif %}" 
+                   href="{{ url_for('admin.manage_borrowings') }}">
+                    全部借阅
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if status == 'borrowed' %}active{% endif %}" 
+                   href="{{ url_for('admin.manage_borrowings', status='borrowed') }}">
+                    <i class="fas fa-hourglass-half me-1"></i>借阅中
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if status == 'overdue' %}active{% endif %}" 
+                   href="{{ url_for('admin.manage_borrowings', status='overdue') }}">
+                    <i class="fas fa-exclamation-circle me-1 text-danger"></i>逾期未还
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if status == 'returned' %}active{% endif %}" 
+                   href="{{ url_for('admin.manage_borrowings', status='returned') }}">
+                    <i class="fas fa-check-circle me-1"></i>已归还
+                </a>
+            </li>
+        </ul>
+        
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>共 <strong>{{ total }}</strong> 条借阅记录
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>借阅人</th>
+                        <th>书名</th>
+                        <th>作者</th>
+                        <th>借书日期</th>
+                        <th>应还日期</th>
+                        <th>还书日期</th>
+                        <th>状态</th>
+                        <th>罚款</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td>{{ record.id }}</td>
+                        <td>{{ record.real_name }}<br><small class="text-muted">{{ record.username }}</small></td>
+                        <td>
+                            <a href="{{ url_for('books.detail', book_id=record.book_id) }}" class="text-decoration-none">
+                                {{ record.title }}
+                            </a>
+                        </td>
+                        <td>{{ record.author }}</td>
+                        <td>{{ record.borrow_date }}</td>
+                        <td class="{% if record.status == 'overdue' %}text-danger fw-bold{% endif %}">
+                            {{ record.due_date }}
+                        </td>
+                        <td>{{ record.return_date if record.return_date else '-' }}</td>
+                        <td>
+                            {% if record.status == 'borrowed' %}
+                            <span class="badge bg-warning">
+                                <i class="fas fa-hourglass-half me-1"></i>借阅中
+                            </span>
+                            {% elif record.status == 'overdue' %}
+                            <span class="badge bg-danger">
+                                <i class="fas fa-exclamation-circle me-1"></i>逾期未还
+                            </span>
+                            {% elif record.status == 'returned' %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>已归还
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.fine and record.fine > 0 %}
+                            <span class="text-danger">¥{{ "%.2f"|format(record.fine) }}</span>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">
+                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                            暂无借阅记录
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 分页 -->
+        {% if total > 20 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin.manage_borrowings', page=page-1, status=status) }}">
+                        上一页
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% set total_pages = ((total - 1) // 20 + 1) %}
+                {% for p in range(1, total_pages + 1) %}
+                    {% if p == page %}
+                    <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                    {% elif p <= 5 or p > total_pages - 3 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.manage_borrowings', page=p, status=status) }}">
+                            {{ p }}
+                        </a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page < total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin.manage_borrowings', page=page+1, status=status) }}">
+                        下一页
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

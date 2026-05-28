@@ -8,10 +8,15 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('books.list') }}">图书查询</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ book.title }}</li>
+                {% if book.category_name %}
+                <li class="breadcrumb-item">
+                    <a href="{{ url_for('books.list', category=book.category_id) }}">{{ book.category_name }}</a>
+                </li>
+                {% endif %}
+                <li class="breadcrumb-item active" aria-current="page">{{ book.title[:30] }}</li>
             </ol>
         </nav>
-        
+
         <div class="card shadow">
             <div class="card-header bg-primary text-white">
                 <h3 class="mb-0">
@@ -21,13 +26,13 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4 text-center">
-                        <div class="bg-light rounded p-3">
+                        <div class="bg-light rounded p-4">
                             <i class="fas fa-book-open fa-5x text-primary"></i>
                         </div>
                         <div class="mt-3">
                             {% if book.available_copies > 0 %}
-                            <form method="POST" action="{{ url_for('borrow.borrow_book', book_id=book.id) }}" class="d-inline">
-                                <button type="submit" class="btn btn-success btn-lg w-100" 
+                            <form method="POST" action="{{ url_for('borrow.borrow_book', book_id=book.id) }}" class="d-inline w-100">
+                                <button type="submit" class="btn btn-success btn-lg w-100"
                                         onclick="return confirm('确认要借阅《{{ book.title }}》吗？')">
                                     <i class="fas fa-hand-holding-heart me-2"></i>立即借阅
                                 </button>
@@ -42,8 +47,8 @@
                     <div class="col-md-8">
                         <table class="table table-bordered">
                             <tr>
-                                <th style="width: 30%">书名</th>
-                                <td>{{ book.title }}</td>
+                                <th style="width: 35%">书名</th>
+                                <td><strong>{{ book.title }}</strong></td>
                             </tr>
                             <tr>
                                 <th>作者</th>
@@ -62,35 +67,81 @@
                                 <td>{{ book.publish_year if book.publish_year else '未知' }}</td>
                             </tr>
                             <tr>
-                                <th>分类号</th>
-                                <td>{{ book.category_code if book.category_code else '无' }}</td>
+                                <th>分类</th>
+                                <td>
+                                    {% if book.category_name %}
+                                    <span class="badge bg-info">
+                                        <i class="{{ book.category_icon or 'fas fa-book' }} me-1"></i>
+                                        {{ book.category_name }}
+                                    </span>
+                                    {% else %}
+                                    未分类
+                                    {% endif %}
+                                </td>
                             </tr>
                             <tr>
                                 <th>索书号</th>
-                                <td>{{ book.call_number if book.call_number else '无' }}</td>
+                                <td><code>{{ book.call_number if book.call_number else '无' }}</code></td>
                             </tr>
                             <tr>
                                 <th>库存信息</th>
                                 <td>
                                     总库存: <strong>{{ book.total_copies }}</strong> 本 |
                                     可借: <strong class="text-success">{{ book.available_copies }}</strong> 本 |
-                                    已借出: <strong class="text-warning">{{ book.total_copies - book.available_copies }}</strong> 本
+                                    已借: <strong class="text-warning">{{ book.total_copies - book.available_copies }}</strong> 本
                                 </td>
                             </tr>
                             <tr>
-                                <th>借阅次数</th>
-                                <td>{{ book.borrow_count }} 次</td>
+                                <th>借阅热度</th>
+                                <td>
+                                    <i class="fas fa-fire text-danger me-1"></i>
+                                    已被借阅 <strong>{{ book.borrow_count }}</strong> 次
+                                </td>
                             </tr>
                         </table>
                     </div>
                 </div>
             </div>
             <div class="card-footer">
-                <a href="{{ url_for('books.list') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-1"></i>返回列表
-                </a>
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('books.list') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>返回列表
+                    </a>
+                    {% if book.category_name %}
+                    <a href="{{ url_for('books.list', category=book.category_id) }}" class="btn btn-outline-info">
+                        <i class="fas fa-tags me-1"></i>查看同类图书
+                    </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
+
+        <!-- 同类推荐 -->
+        {% if similar_books %}
+        <div class="card mt-4 shadow">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-thumbs-up me-2 text-warning"></i>同类推荐
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for similar in similar_books %}
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-book fa-2x text-primary mb-2"></i>
+                            <div class="small fw-bold">{{ similar.title[:20] }}{% if similar.title|length > 20 %}...{% endif %}</div>
+                            <div class="small text-muted">{{ similar.author if similar.author else '佚名' }}</div>
+                            <a href="{{ url_for('books.detail', book_id=similar.id) }}" class="btn btn-sm btn-outline-primary mt-2">
+                                查看详情
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
